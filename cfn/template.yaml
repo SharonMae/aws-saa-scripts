@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Launch a simple EC2 instance for use with testing in VPCs 
+Parameters: 
+  InstanceType:
+    Type: String
+    Default: t3.medium
+    Description: EC2 instance type
+  VpcID: 
+    Type: String
+    Default: vpc-09ff4ce302c63191f
+    Description: VPC ID for the EC2 instance
+  ImageID:
+    Type: String
+    # Default: ami-03fc5ddb25838f0e7 # Microsoft Windows Server 2025
+    Default: ami-02a7ad1c45194c72f # Amazon Linux 2023 AMI
+    Description: AMI ID for the EC2 instance
+  SubnetId:
+    Type: String
+    Default: subnet-02cab3795ee12efc6
+    Description: Subnet ID for the EC2 instance
+Resources:
+  SSMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref SSMRole
+  MyEC2Instance: 
+    Type: AWS::EC2::Instance
+    Properties: 
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref ImageID    
+     # SubnetId: !Ref SubnetId
+     # SecurityGroupIds:
+     #  - !GetAtt SG.GroupId
+      NetworkInterfaces:
+      - DeviceIndex: 0
+        SubnetId: !Ref SubnetId
+        AssociatePublicIpAddress: true
+        GroupSet:
+         - !GetAtt SG.GroupId
+        DeleteOnTermination: true 
+     # UserData: 
+     #   Fn::Base64: |
+     #     #!/bin/bash
+     #     sudo yum update -y
+     #     sudo yum install -y httpd
+     #     sudo systemctl start httpd
+     #     sudo systemctl enable httpd
+     #     echo "<html><body><h1>Hello from Apache on Amazon Linux 2!</h1></body></html>" > /var/www/html/index.html
+  SG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      VpcId: !Ref VpcID
+      SecurityGroupIngress:
+        - IpProtocol: -1           # Allows all inbound protocols
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0        # Allows inbound traffic from any IPv4 address
+      SecurityGroupEgress:
+        - IpProtocol: -1           # Allows all outbound protocols
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0        # Allows outbound traffic to any IPv4 address
