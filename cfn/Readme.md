@@ -5,3 +5,7 @@ Description: Lab7 Task 1 template which builds VPC, supporting resources, a basi
 # Task5
 
 Description: Stack to create a launch configuration for wordpress EC2 servers.
+
+# template
+
+Launch an EC2 instance for use with testing in VPCs.
