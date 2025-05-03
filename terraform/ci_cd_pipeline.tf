@@ -1,26 +1,21 @@
-# Terraform equivalent of CI/CD pipeline for automatic deployment to EC2
-
-# This version assumes:
-# - GitHub as source repo
-# - S3 for artifact storage
-# - CodeDeploy for deployment to EC2
-# - IAM roles created inline
-
 provider "aws" {
   region = "us-east-1"
 }
 
+# S3 bucket for storing artifacts
 resource "aws_s3_bucket" "artifact_bucket" {
   bucket = "artifact-bucket-${terraform.workspace}-${data.aws_region.current.name}"
 }
 
 data "aws_region" "current" {}
 
+# CodeDeploy Application
 resource "aws_codedeploy_app" "webapp" {
-  name = "WebApp"
+  name             = "WebApp"
   compute_platform = "Server"
 }
 
+# IAM Role for CodeDeploy
 resource "aws_iam_role" "codedeploy_role" {
   name = "CodeDeployServiceRole"
 
@@ -48,6 +43,7 @@ resource "aws_iam_role_policy" "codedeploy_policy" {
   })
 }
 
+# CodeDeploy Deployment Group
 resource "aws_codedeploy_deployment_group" "webapp_group" {
   app_name              = aws_codedeploy_app.webapp.name
   deployment_group_name = "WebAppDeployGroup"
@@ -62,6 +58,7 @@ resource "aws_codedeploy_deployment_group" "webapp_group" {
   }
 }
 
+# IAM Role for CodePipeline
 resource "aws_iam_role" "codepipeline_role" {
   name = "CodePipelineServiceRole"
 
