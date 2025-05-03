@@ -1,36 +1,36 @@
 provider "aws" {
-  region = "eu-central-1" # Use your desired AWS region
+  region = "us-east-1"  # Cambia la regione AWS a seconda delle tue preferenze (es. "us-east-1", "eu-central-1", etc.)
 }
 
 # VPC
 resource "aws_vpc" "main" {
-  cidr_block           = "10.0.0.0/16"
+  cidr_block           = "10.1.0.0/16"  # Cambiato il blocco CIDR (es. "10.1.0.0/16")
   enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
-    Name = "tf-vpc"
+    Name = "custom-vpc"
   }
 }
 
 # Public Subnet
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.1.0/24"
+  cidr_block              = "10.1.1.0/24"  # Cambiato il CIDR della subnet pubblica
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "public-subnet-tf"
+    Name = "public-subnet-custom"
   }
 }
 
 # Private Subnet
 resource "aws_subnet" "private" {
   vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
+  cidr_block = "10.1.2.0/24"  # Cambiato il CIDR della subnet privata
 
   tags = {
-    Name = "private-subnet-tf"
+    Name = "private-subnet-custom"
   }
 }
 
@@ -39,7 +39,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "igw-tf"
+    Name = "custom-igw"
   }
 }
 
@@ -53,7 +53,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name = "public-route-table-tf"
+    Name = "public-route-table-custom"
   }
 }
 
@@ -64,65 +64,66 @@ resource "aws_route_table_association" "public" {
 }
 
 # Security Group 
-resource "aws_security_group" "tf-sg" {
+resource "aws_security_group" "custom-sg" {
   vpc_id = aws_vpc.main.id
-  name   = "tg-sg" 
+  name   = "custom-sg" 
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["yourIP/32"] # use your IP /32 to allow ssh only from your IP
+    cidr_blocks = ["198.51.100.0/24"]  # Permessi SSH solo per una IP range specifica (modificato l'IP di origine)
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]  # Permessi HTTP per tutti
   }
 
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]  # Permessi HTTPS per tutti
   }
 
   ingress {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]  # Permessi per porta 3000
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]  # Permessi di uscita per tutte le destinazioni
   }
 
   tags = {
-    Name = "tf-sg"
+    Name = "custom-sg"
   }
 }
 
 # EC2 Instance
-resource "aws_instance" "nupn" {
-  ami                         = "ami" # replace with your AMI ID
-  instance_type               = "t2.micro"
+resource "aws_instance" "my_instance" {
+  ami                         = "ami-12345678"  # Sostituisci con un ID AMI corretto
+  instance_type               = "t3.micro"  # Tipo di istanza modificato
   subnet_id                   = aws_subnet.public.id
-  vpc_security_group_ids      = [aws_security_group.tf-sg.id]
+  vpc_security_group_ids      = [aws_security_group.custom-sg.id]
   associate_public_ip_address = true
-  key_name                    = "stacknupn" ## Use your key pair name
+  key_name                    = "my-key-pair"  # Modificato con un nome di key pair personalizzato
 
   user_data = <<-EOF
               #!/bin/bash
-              bash /home/ubuntu/script_nginx.sh
+              # Modifica il comando per adattarsi alla tua configurazione
+              bash /home/ubuntu/setup_nginx.sh
               EOF
 
   tags = {
-    Name = "nupn-terraform"
+    Name = "custom-instance"
   }
 }
