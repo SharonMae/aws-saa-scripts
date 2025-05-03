@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
-Description: Launch an EC2 instance for use with testing in VPCs.
+Description: Deploy an EC2 instance to perform testing within a VPC environment.
 
 Parameters: 
   InstanceType:
