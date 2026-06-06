@@ -8,7 +8,7 @@ Parameters:
   VpcID: 
     Type: String
     Default: vpc-03dfe3677e0175cf0
-    Description: VPC ID for the EC2 instance
+    Description: VPC ID for the EC2 instance 
   ImageID:
     Type: String
     Default: ami-0135d6e60c6532bf2
