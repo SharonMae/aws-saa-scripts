@@ -41,7 +41,7 @@ Amazon SNS
 Amazon SQS
 AWS Step Functions
 
-Analytics & Data- 
+Analytics & Data
 
 AWS Glue
 
@@ -118,9 +118,9 @@ cd AWS- SAA
 
 Accedi quindi alla cartella del servizio di interesse e segui le istruzioni o gli script presenti.
 
-## Finalità didattica
+## Finalità
 
-Questo repository ha esclusivamente scopo educativo e dimostrativo.
+Questo repository ha scopo educativo e dimostrativo.
 
 Gli esempi sono progettati per comprendere:
 
